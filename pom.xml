@@ -10,7 +10,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.0.3.RELEASE</version>
-		<relativePath/>
+		<relativePath />
 	</parent>
 
 	<properties>
@@ -21,7 +21,7 @@
 	</properties>
 
 	<dependencies>
-	
+
 		<!-- CONFIG -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -43,7 +43,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -55,8 +55,15 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -69,7 +76,19 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
@@ -77,7 +96,7 @@
 				<configuration>
 					<imageName>config-ms</imageName>
 					<baseImage>openjdk:8-jdk-alpine</baseImage>
-					<entryPoint> ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/config-ms.jar"]
+					<entryPoint> ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/${project.build.finalName}.jar"]
 					</entryPoint>
 					<resources>
 						<resource>
@@ -87,12 +106,35 @@
 						</resource>
 					</resources>
 					<imageTags>
-						<imageTag>${project.version}</imageTag>
-						<imageTag>latest</imageTag>
+						<imageTag>${project.version}</imageTag>						
 					</imageTags>
 				</configuration>
 			</plugin>
-			
+
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>env-dev</id>
+			<properties>
+				<activatedProperties>dev</activatedProperties>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>env-hom</id>
+			<properties>
+				<activatedProperties>hom</activatedProperties>
+			</properties>
+		</profile>
+		<profile>
+			<id>env-prd</id>
+			<properties>
+				<activatedProperties>prd</activatedProperties>
+			</properties>
+		</profile>
+	</profiles>
 </project>
